@@ -17,11 +17,7 @@ import { MatToolbarModule } from '@angular/material/toolbar';
 import { RouterModule } from '@angular/router';
 import { OAuthService } from 'angular-oauth2-oidc';
 import { subscribeOn } from 'rxjs';
-<<<<<<< HEAD
 import { LogoutComponent } from '../logout/logout.component';
-=======
-import { LogoutConfirmDialogComponent } from '../logout/logoutconfirm.component';
->>>>>>> 58bc54b3781d6dae32dae6e4ce4c9aa9dc670e27
 
 const MATERIAL_MODULE = [
   MatIconModule,
@@ -152,11 +148,7 @@ export class ToolbarComponent /* implements OnInit */ {
   ) {}
 
   logout() {
-<<<<<<< HEAD
     const dialogRef = this.dialog.open(LogoutComponent);
-=======
-    const dialogRef = this.dialog.open(LogoutConfirmDialogComponent);
->>>>>>> 58bc54b3781d6dae32dae6e4ce4c9aa9dc670e27
 
     dialogRef.afterClosed().subscribe((result) => {
       if (result === true) {
@@ -164,8 +156,4 @@ export class ToolbarComponent /* implements OnInit */ {
       }
     });
   }
-<<<<<<< HEAD
 }
-=======
-}
->>>>>>> 58bc54b3781d6dae32dae6e4ce4c9aa9dc670e27
