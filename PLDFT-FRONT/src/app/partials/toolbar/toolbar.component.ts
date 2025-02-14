@@ -1,21 +1,23 @@
-import { ChangeDetectionStrategy, Component,inject } from '@angular/core';
-import { MatIconModule } from '@angular/material/icon';
-import { MatToolbarModule } from '@angular/material/toolbar';
-import { MatButtonModule } from '@angular/material/button';
-import { MatMenuModule } from '@angular/material/menu';  // Importación del MatMenuModule
-import { RouterModule } from '@angular/router';
-import { MatBadgeModule } from '@angular/material/badge';
-import { OAuthService } from 'angular-oauth2-oidc';
 import { HttpClient } from '@angular/common/http';
+import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
+import { MatBadgeModule } from '@angular/material/badge';
+import { MatButtonModule } from '@angular/material/button';
 import {
   MatDialog,
   MatDialogActions,
   MatDialogClose,
   MatDialogContent,
+  MatDialogModule,
   MatDialogRef,
   MatDialogTitle,
 } from '@angular/material/dialog';
-
+import { MatIconModule } from '@angular/material/icon';
+import { MatMenuModule } from '@angular/material/menu'; // Importación del MatMenuModule
+import { MatToolbarModule } from '@angular/material/toolbar';
+import { RouterModule } from '@angular/router';
+import { OAuthService } from 'angular-oauth2-oidc';
+import { subscribeOn } from 'rxjs';
+import { LogoutConfirmDialogComponent } from '../logout/logoutconfirm.component';
 
 const MATERIAL_MODULE = [
   MatIconModule,
@@ -24,7 +26,7 @@ const MATERIAL_MODULE = [
   MatMenuModule,
   RouterModule,
   MatBadgeModule,
-  
+  MatDialogModule,
 ];
 
 @Component({
@@ -33,8 +35,7 @@ const MATERIAL_MODULE = [
   imports: [MATERIAL_MODULE],
   template: `
     <mat-toolbar color="accent">
-
-      <img src="LOGO-PLD.png" alt="Logo PLD/FT" class="logonav">
+      <img src="LOGO-PLD.png" alt="Logo PLD/FT" class="logonav" />
 
       <!-- Íconos a la izquierda -->
       <div class="nav-links-left">
@@ -50,30 +51,45 @@ const MATERIAL_MODULE = [
 
       <!-- Íconos a la derecha -->
       <div class="nav-links-right">
-      
-        
-        <a mat-button routerLink="/alerts"><mat-icon>notifications_none</mat-icon></a>
-        <a mat-button (click)="logout()">
-        <mat-icon>exit_to_app</mat-icon></a>
-
+        <a mat-button routerLink="/alerts"
+          ><mat-icon>notifications_none</mat-icon></a
+        >
+        <a mat-button (click)="logout()"> <mat-icon>exit_to_app</mat-icon></a>
       </div>
 
       <!-- Botón de menú hamburguesa para pantallas pequeñas -->
-      <button mat-icon-button [matMenuTriggerFor]="menu" class="mobile-menu-button">
+      <button
+        mat-icon-button
+        [matMenuTriggerFor]="menu"
+        class="mobile-menu-button"
+      >
         <mat-icon>menu</mat-icon>
       </button>
-
     </mat-toolbar>
 
     <!-- Menú desplegable -->
     <mat-menu #menu="matMenu">
-      <button mat-menu-item routerLink="/"><mat-icon>home</mat-icon> Home</button>
-      <button mat-menu-item routerLink="/list"><mat-icon>local_library</mat-icon> Users</button>
-      <button mat-menu-item routerLink="/"><mat-icon>person</mat-icon> Profile</button>
-      <button mat-menu-item routerLink="/"><mat-icon>lock</mat-icon> Security</button>
-      <button mat-menu-item routerLink="/operations"><mat-icon>settings</mat-icon> Settings</button>
-      <button mat-menu-item routerLink="/alerts"><mat-icon>notifications_none</mat-icon> Alerts</button>
-      <button mat-menu-item (click)="logout()"><mat-icon>exit_to_app</mat-icon> Logout</button>
+      <button mat-menu-item routerLink="/">
+        <mat-icon>home</mat-icon> Home
+      </button>
+      <button mat-menu-item routerLink="/list">
+        <mat-icon>local_library</mat-icon> Users
+      </button>
+      <button mat-menu-item routerLink="/">
+        <mat-icon>person</mat-icon> Profile
+      </button>
+      <button mat-menu-item routerLink="/">
+        <mat-icon>lock</mat-icon> Security
+      </button>
+      <button mat-menu-item routerLink="/operations">
+        <mat-icon>settings</mat-icon> Settings
+      </button>
+      <button mat-menu-item routerLink="/alerts">
+        <mat-icon>notifications_none</mat-icon> Alerts
+      </button>
+      <button mat-menu-item (click)="logout()">
+        <mat-icon>exit_to_app</mat-icon> Logout
+      </button>
     </mat-menu>
   `,
   styles: `
@@ -122,13 +138,22 @@ const MATERIAL_MODULE = [
         margin-left: auto; /* Empuja el botón a la derecha */
       }
     }
-  `
+  `,
 })
 export class ToolbarComponent /* implements OnInit */ {
-  constructor(private oauthService: OAuthService, private httpClient: HttpClient) { }
+  constructor(
+    private oauthService: OAuthService,
+    private httpClient: HttpClient,
+    private dialog: MatDialog
+  ) {}
 
   logout() {
-    this.oauthService.logOut();
-  }
+    const dialogRef = this.dialog.open(LogoutConfirmDialogComponent);
 
+    dialogRef.afterClosed().subscribe((result) => {
+      if (result === true) {
+        this.oauthService.logOut();
+      }
+    });
+  }
 }
