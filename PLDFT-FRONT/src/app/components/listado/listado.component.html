@@ -200,6 +200,7 @@
               </ng-container>
 
               <!-- Columna de completitud -->
+              <!-- Columna de completitud -->
               <ng-container matColumnDef="completitud">
                 <th mat-header-cell *matHeaderCellDef> COMPLETO </th>
                 <td mat-cell *matCellDef="let cliente">
@@ -307,7 +308,7 @@
               </td>
             </ng-container>
 
-            <!-- Add other columns similar to the ones above  modifique aqui -->
+            <!-- Add other columns similar to the ones above -->
             <tr mat-header-row *matHeaderRowDef="displayedColumnsOtrosDatos"></tr>
             <tr mat-row *matRowDef="let row; columns: displayedColumnsOtrosDatos;"></tr>
             <tr class="mat-row" *matNoDataRow>
