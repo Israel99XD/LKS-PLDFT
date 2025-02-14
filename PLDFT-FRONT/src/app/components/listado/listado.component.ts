@@ -71,6 +71,7 @@ export class ListadoComponent implements OnInit, AfterViewInit {
         if (data[0] && typeof data[0].personaFisica === 'string') {
           const personaFisicaArray = JSON.parse(data[0].personaFisica);
           this.clientes = personaFisicaArray;
+          console.log(personaFisicaArray);
           this.dataSourceClientes.data = this.clientes;
           this.jsonCompleto = data;
         } else {
