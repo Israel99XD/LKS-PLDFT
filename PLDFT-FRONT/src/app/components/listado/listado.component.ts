@@ -11,13 +11,21 @@ import { MatPaginatorModule } from '@angular/material/paginator';
 import { MatInputModule } from '@angular/material/input';
 import { SideNavComponent } from '../../partials/side-nav/side-nav.component';
 import { ParseJsonPipe } from '../../parse-json.pipe';
+import { InfoClienteComponent } from '../modales/info-cliente/info-cliente.component';
+import { MatDialog } from '@angular/material/dialog';
+import { MatDialogModule } from '@angular/material/dialog';
+import { OAuthService } from 'angular-oauth2-oidc';
+import { HttpClient } from '@angular/common/http';
+import { MatButtonModule } from '@angular/material/button';
 
 const MATERIAL_MODULES = [
   MatInputModule,
   MatPaginatorModule,
   MatSortModule,
   MatTableModule,
-  MatFormFieldModule
+  MatFormFieldModule,
+  MatDialogModule,
+  MatButtonModule
 ];
 
 @Component({
@@ -28,6 +36,8 @@ const MATERIAL_MODULES = [
   styleUrls: ['./listado.component.scss'],
 })
 export class ListadoComponent implements OnInit, AfterViewInit {
+
+  
 
   mostrarTabla: string | null = null;
   clientes: any[] = [];
@@ -54,7 +64,11 @@ export class ListadoComponent implements OnInit, AfterViewInit {
   @ViewChild(MatPaginator) paginator!: MatPaginator;
   @ViewChild(MatSort) sort!: MatSort;
 
-  constructor(private clienteService: ClienteService) { }
+  constructor(
+    private clienteService: ClienteService,
+    private dialog: MatDialog,
+  private oauthService: OAuthService,
+      private httpClient: HttpClient,) { }
 
   ngOnInit() { }
 
@@ -152,5 +166,14 @@ verificarCompletitud(cliente: any, tipo: string): boolean {
   return camposRequeridos.every(campo => cliente[campo] !== null && cliente[campo] !== '');
 }
 
+mostrarInfo() {
+    const dialogRef = this.dialog.open(InfoClienteComponent);
+
+    dialogRef.afterClosed().subscribe((result) => {
+      if (result === true) {
+        this.oauthService.logOut();
+      }
+    });
+  }
 
 }
