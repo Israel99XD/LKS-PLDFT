@@ -10,8 +10,8 @@ import { Observable } from 'rxjs';
 export class ClienteService {
   // Se definen las URLs base y específicas para los clientes
   private baseUrl = 'http://122.8.186.221:7582';  // Dirección base del servidor
-  private urlClientesF = `${this.baseUrl}/clientes/spsClientesFM/TIJ-0000001/268`;  // URL para obtener clientes del perfil F
-  private urlClientesM = `${this.baseUrl}/clientes/spsClientesFM/TIJ-0000003-MR/269`;  // URL para obtener clientes del perfil M
+  private urlClientesF = `${this.baseUrl}/clientes/spsClientesFM/ /268`;  // URL para obtener clientes del perfil F
+  private urlClientesM = `${this.baseUrl}/clientes/spsClientesFM/ /269`;  // URL para obtener clientes del perfil M
 
   // Se inyecta HttpClient para hacer solicitudes HTTP
   constructor(private http: HttpClient) { }
