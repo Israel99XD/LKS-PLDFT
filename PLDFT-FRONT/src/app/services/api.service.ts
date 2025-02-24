@@ -20,12 +20,10 @@ export class ClienteService {
   getClientesPerF(): Observable<any> {
     // Se obtiene el token de autenticación almacenado en el localStorage
     const token = localStorage.getItem('token');
-    
     // Se crea un objeto de cabeceras para la solicitud, con el token de autenticación
     const headers = new HttpHeaders({
       'Authorization': `Bearer ${token}`  // Se agrega el token al encabezado de autorización
     });
-
     // Se hace una solicitud GET a la URL para obtener los clientes del perfil F
     return this.http.get(this.urlClientesF, { headers });
   }
@@ -34,12 +32,10 @@ export class ClienteService {
   getClientesPerM(): Observable<any> {
     // Se obtiene el token de autenticación almacenado en el localStorage
     const token = localStorage.getItem('token');
-    
     // Se crea un objeto de cabeceras para la solicitud, con el token de autenticación
     const headers = new HttpHeaders({
       'Authorization': `Bearer ${token}`  // Se agrega el token al encabezado de autorización
     });
-
     // Se hace una solicitud GET a la URL para obtener los clientes del perfil M
     return this.http.get(this.urlClientesM, { headers });
   }
