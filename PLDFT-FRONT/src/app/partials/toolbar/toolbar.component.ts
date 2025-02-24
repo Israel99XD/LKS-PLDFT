@@ -29,8 +29,8 @@ const MATERIAL_MODULE = [
   standalone: true,
   imports: [MATERIAL_MODULE],
   template: `
-    <mat-toolbar color="accent">
-      <img src="LOGO-PLD.png" alt="Logo PLD/FT" class="logonav" />
+    <mat-toolbar color="primary">
+      <img src="LOGO2.jpg" alt="Logo PLD/FT" class="logonav" />
 
       <!-- Íconos a la izquierda -->
       <div class="nav-links-left">
