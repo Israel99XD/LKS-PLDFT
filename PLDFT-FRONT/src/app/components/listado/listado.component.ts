@@ -1,23 +1,19 @@
 // Importaciones necesarias de Angular y Material
-import { AfterViewInit, Component, OnInit, ViewChild } from '@angular/core';
-import { ClienteService } from '../../services/api.service'; // Servicio para obtener datos de clientes
 import { CommonModule } from '@angular/common'; // Módulo común de Angular
-import { MatPaginator } from '@angular/material/paginator'; // Componente para paginación de Material
-import { MatSort } from '@angular/material/sort'; // Componente para ordenar tablas de Material
-import { MatTableDataSource } from '@angular/material/table'; // Fuente de datos para las tablas de Material
-import { MatFormFieldModule } from '@angular/material/form-field'; // Módulo de formulario de Material
-import { MatTableModule } from '@angular/material/table'; 
-import { MatSortModule } from '@angular/material/sort';
-import { MatPaginatorModule } from '@angular/material/paginator';
-import { MatInputModule } from '@angular/material/input';
-import { SideNavComponent } from '../../partials/side-nav/side-nav.component'; // Componente de barra lateral
-import { ParseJsonPipe } from '../../parse-json.pipe'; // Pipe personalizado para parsear JSON
-import { InfoClienteComponent } from '../modales/info-cliente/info-cliente.component'; // Modal para mostrar información del cliente
-import { MatDialog } from '@angular/material/dialog'; // Servicio para manejar diálogos de Material
-import { MatDialogModule } from '@angular/material/dialog';
-import { OAuthService } from 'angular-oauth2-oidc'; // Servicio de autenticación OAuth
 import { HttpClient } from '@angular/common/http'; // Cliente HTTP para peticiones API
+import { AfterViewInit, Component, OnInit, ViewChild } from '@angular/core';
 import { MatButtonModule } from '@angular/material/button';
+import { MatDialog, MatDialogModule } from '@angular/material/dialog'; // Servicio para manejar diálogos de Material
+import { MatFormFieldModule } from '@angular/material/form-field'; // Módulo de formulario de Material
+import { MatInputModule } from '@angular/material/input';
+import { MatPaginator, MatPaginatorModule } from '@angular/material/paginator'; // Componente para paginación de Material
+import { MatSort, MatSortModule } from '@angular/material/sort'; // Componente para ordenar tablas de Material
+import { MatTableDataSource, MatTableModule } from '@angular/material/table'; // Fuente de datos para las tablas de Material
+import { OAuthService } from 'angular-oauth2-oidc'; // Servicio de autenticación OAuth
+import { ParseJsonPipe } from '../../parse-json.pipe'; // Pipe personalizado para parsear JSON
+import { SideNavComponent } from '../../partials/side-nav/side-nav.component'; // Componente de barra lateral
+import { ClienteService } from '../../services/api.service'; // Servicio para obtener datos de clientes
+import { InfoClienteComponent } from '../modales/info-cliente/info-cliente.component'; // Modal para mostrar información del cliente
 
 // Agrupación de módulos de Material para facilitar la importación
 const MATERIAL_MODULES = [
@@ -27,7 +23,7 @@ const MATERIAL_MODULES = [
   MatTableModule,
   MatFormFieldModule,
   MatDialogModule,
-  MatButtonModule
+  MatButtonModule,
 ];
 
 // Decorador del componente
@@ -39,28 +35,56 @@ const MATERIAL_MODULES = [
   styleUrls: ['./listado.component.scss'],
 })
 export class ListadoComponent implements OnInit, AfterViewInit {
-
   mostrarTabla: string | null = null; // Variable para determinar qué tabla mostrar
   clientes: any[] = []; // Almacena clientes de tipo Persona Física
   otrosDatos: any[] = []; // Almacena clientes de tipo Persona Moral
+  movimientos: any[] = [];
   jsonCompleto: any; // Guarda el JSON completo recibido
 
   // Definición de las columnas para la tabla de Persona Física
   displayedColumnsClientes: string[] = [
-    'name', 'n_cliente', 'status', 'curp', 'nacionalidad',
-    'genero_cl', 'fecha_nacimiento', 'ocupacion', 'calle',
-    'ciudad', 'telefono', 'correo', 'completitud'
+    'name',
+    'n_cliente',
+    'status',
+    'curp',
+    'nacionalidad',
+    'genero_cl',
+    'fecha_nacimiento',
+    'ocupacion',
+    'calle',
+    'ciudad',
+    'telefono',
+    'correo',
+    'completitud',
   ];
 
   // Definición de las columnas para la tabla de Persona Moral
   displayedColumnsOtrosDatos: string[] = [
-    'razon_social', 'giro', 'nacionalidad', 'rfc', 'e_firma',
-    'domicilio', 'telefono', 'correo', 'fecha_const', 'representante' ,'completitud'
+    'razon_social',
+    'giro',
+    'nacionalidad',
+    'rfc',
+    'e_firma',
+    'domicilio',
+    'telefono',
+    'correo',
+    'fecha_const',
+    'representante',
+    'completitud',
+  ];
+
+  displayedColumnsMovimientos: string[] = [
+    'movimientoID',
+    'cveMovimiento',
+    'descMovimiento',
+    'saldo',
+    'completitud',
   ];
 
   // Fuente de datos para las tablas de Persona Física y Persona Moral
   dataSourceClientes = new MatTableDataSource<any>();
   dataSourceClientesM = new MatTableDataSource<any>();
+  dataSourceMovimientos = new MatTableDataSource<any>();
 
   // Referencias a los componentes de paginación y ordenación
   @ViewChild(MatPaginator) paginator!: MatPaginator;
@@ -72,10 +96,10 @@ export class ListadoComponent implements OnInit, AfterViewInit {
     private dialog: MatDialog,
     private oauthService: OAuthService,
     private httpClient: HttpClient
-  ) { }
+  ) {}
 
   // Método del ciclo de vida de Angular, se ejecuta al iniciar el componente
-  ngOnInit() { }
+  ngOnInit() {}
 
   // Método que se ejecuta después de que la vista se ha inicializado
   ngAfterViewInit() {
@@ -83,6 +107,8 @@ export class ListadoComponent implements OnInit, AfterViewInit {
     this.dataSourceClientes.sort = this.sort;
     this.dataSourceClientesM.paginator = this.paginator;
     this.dataSourceClientesM.sort = this.sort;
+    this.dataSourceMovimientos.paginator = this.paginator;
+    this.dataSourceMovimientos.sort = this.sort;
   }
 
   // Obtiene la lista de clientes Persona Física desde el servicio
@@ -96,12 +122,14 @@ export class ListadoComponent implements OnInit, AfterViewInit {
           this.dataSourceClientes.data = this.clientes;
           this.jsonCompleto = data;
         } else {
-          console.error('El campo personaFisica no es un string válido o no existe.');
+          console.error(
+            'El campo personaFisica no es un string válido o no existe.'
+          );
         }
       },
       error: (error) => {
         console.error('Error al obtener clientes:', error);
-      }
+      },
     });
   }
 
@@ -116,12 +144,32 @@ export class ListadoComponent implements OnInit, AfterViewInit {
           this.dataSourceClientesM.data = this.otrosDatos;
           this.jsonCompleto = data;
         } else {
-          console.error('El campo personaMoral no es un string válido o no existe.');
+          console.error(
+            'El campo personaMoral no es un string válido o no existe.'
+          );
         }
       },
       error: (error) => {
         console.error('Error al obtener clientes:', error);
-      }
+      },
+    });
+  }
+
+  getMovimientos() {
+    this.clienteService.getMovimientos().subscribe({
+      next: (data) => {
+        if (Array.isArray(data)) {
+          // Verifica si `data` es un array
+          this.movimientos = data; // Asigna directamente los movimientos
+          console.log('Movimientos obtenidos:', this.movimientos);
+          this.dataSourceMovimientos.data = this.movimientos; // Actualiza la tabla
+        } else {
+          console.error('La respuesta de la API no es un array válido:', data);
+        }
+      },
+      error: (error) => {
+        console.error('Error al obtener movimientos:', error);
+      },
     });
   }
 
@@ -138,6 +186,11 @@ export class ListadoComponent implements OnInit, AfterViewInit {
       if (this.dataSourceClientesM.paginator) {
         this.dataSourceClientesM.paginator.firstPage();
       }
+    } else if (tipo === 'movimientos') {
+      this.dataSourceMovimientos.filter = filterValue.trim().toLowerCase();
+      if (this.dataSourceMovimientos.paginator) {
+        this.dataSourceMovimientos.paginator.firstPage();
+      }
     }
   }
 
@@ -152,40 +205,69 @@ export class ListadoComponent implements OnInit, AfterViewInit {
       this.getClientesPerM();
       this.dataSourceClientes = new MatTableDataSource<any>();
     }
+    if (tipoCliente === '3') {
+      this.getMovimientos();
+      this.dataSourceMovimientos = new MatTableDataSource<any>();
+    }
   }
 
   // Verifica si los campos requeridos están completos para determinar la "completitud"
   verificarCompletitud(cliente: any, tipo: string): boolean {
     let camposRequeridos: string[] = [];
-  
+
     if (tipo === 'clientes') {
       camposRequeridos = [
-        'name', 'n_cliente', 'status', 'curp', 'nacionalidad',
-        'genero_cl', 'fecha_nacimiento', 'ocupacion', 'calle',
-        'ciudad', 'telefono', 'correo', 'agendacl'
+        'name',
+        'n_cliente',
+        'status',
+        'curp',
+        'nacionalidad',
+        'genero_cl',
+        'fecha_nacimiento',
+        'ocupacion',
+        'calle',
+        'ciudad',
+        'telefono',
+        'correo',
+        'agendacl',
       ];
     } else if (tipo === 'otrosDatos') {
       camposRequeridos = [
-        'razon_social', 'giro', 'nacionalidad', 'rfc', 'e_firma',
-        'domicilio', 'telefono', 'correo', 'fecha_const', 'representante'
+        'razon_social',
+        'giro',
+        'nacionalidad',
+        'rfc',
+        'e_firma',
+        'domicilio',
+        'telefono',
+        'correo',
+        'fecha_const',
+        'representante',
+      ];
+    } else if (tipo === 'movimientos') {
+      camposRequeridos = [
+        'movimientoID',
+        'cveMovimiento',
+        'descMovimiento',
+        'saldo',
       ];
     }
-  
-    return camposRequeridos.every(campo => {
+
+    return camposRequeridos.every((campo) => {
       let valor = cliente[campo];
-  
+
       if (campo === 'agendacl' && typeof valor === 'string') {
         try {
           const agendaArray = JSON.parse(valor);
-          return agendaArray.every((item: any) => 
-            item.telefono !== null && item.correo !== null
-          ); 
+          return agendaArray.every(
+            (item: any) => item.telefono !== null && item.correo !== null
+          );
         } catch (error) {
-          console.error("Error al parsear agendacl:", error);
+          console.error('Error al parsear agendacl:', error);
           return false;
         }
       }
-  
+
       return valor !== null && valor !== '' && valor !== 'null';
     });
   }
