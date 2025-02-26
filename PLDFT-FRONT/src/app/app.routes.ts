@@ -5,7 +5,7 @@ import { NgModule } from '@angular/core';
 import { AuthGuard } from './guards/auth.guard';
 
 export const routes: Routes = [
-    { path: '', component: HomeComponent, title: 'Home',canActivate: [AuthGuard]}, // Ruta para la página de inicio, accesible en el root ('').
+    { path: '', component: HomeComponent, title: 'Home', canActivate: [AuthGuard] }, // Ruta para la página de inicio, accesible en el root ('').
     { path: 'list', component: ListadoComponent, title: 'List', canActivate: [AuthGuard] } // Ruta para mostrar las tablas de los clientes
 ];
 

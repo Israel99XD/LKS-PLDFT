@@ -2,6 +2,7 @@
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
+import { OAuthService } from 'angular-oauth2-oidc';
 
 // Se marca la clase como un servicio inyectable para que Angular la administre
 @Injectable({
@@ -14,8 +15,9 @@ export class ClienteService {
   private urlClientesM = `${this.baseUrl}/clientes/spsClientesFM/ /269`; // URL para obtener clientes del perfil M
   private urlMovimientos = `${this.baseUrl}/tesoreria/lista-saldoMovimiento-by-cliente/1/1`; // URL oara obtener los movimientos por cliente
 
+
   // Se inyecta HttpClient para hacer solicitudes HTTP
-  constructor(private http: HttpClient) {}
+  constructor(private http: HttpClient, private oauthService: OAuthService) { }
 
   // Método para obtener los clientes del perfil F
   getClientesPerF(): Observable<any> {
