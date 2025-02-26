@@ -14,6 +14,8 @@ import { ParseJsonPipe } from '../../parse-json.pipe'; // Pipe personalizado par
 import { SideNavComponent } from '../../partials/side-nav/side-nav.component'; // Componente de barra lateral
 import { ClienteService } from '../../services/api.service'; // Servicio para obtener datos de clientes
 import { InfoClienteComponent } from '../modales/info-cliente/info-cliente.component'; // Modal para mostrar información del cliente
+import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
+
 
 // Agrupación de módulos de Material para facilitar la importación
 const MATERIAL_MODULES = [
@@ -24,6 +26,7 @@ const MATERIAL_MODULES = [
   MatFormFieldModule,
   MatDialogModule,
   MatButtonModule,
+  MatProgressSpinnerModule
 ];
 
 // Decorador del componente
@@ -40,6 +43,7 @@ export class ListadoComponent implements OnInit, AfterViewInit {
   otrosDatos: any[] = []; // Almacena clientes de tipo Persona Moral
   movimientos: any[] = [];
   jsonCompleto: any; // Guarda el JSON completo recibido
+  cargando: boolean = false;
 
   // Definición de las columnas para la tabla de Persona Física
   displayedColumnsClientes: string[] = [
@@ -77,8 +81,7 @@ export class ListadoComponent implements OnInit, AfterViewInit {
     'movimientoID',
     'cveMovimiento',
     'descMovimiento',
-    'saldo',
-    'completitud',
+    'saldo'
   ];
 
   // Fuente de datos para las tablas de Persona Física y Persona Moral
@@ -96,10 +99,10 @@ export class ListadoComponent implements OnInit, AfterViewInit {
     private dialog: MatDialog,
     private oauthService: OAuthService,
     private httpClient: HttpClient
-  ) {}
+  ) { }
 
   // Método del ciclo de vida de Angular, se ejecuta al iniciar el componente
-  ngOnInit() {}
+  ngOnInit() { }
 
   // Método que se ejecuta después de que la vista se ha inicializado
   ngAfterViewInit() {
@@ -113,6 +116,7 @@ export class ListadoComponent implements OnInit, AfterViewInit {
 
   // Obtiene la lista de clientes Persona Física desde el servicio
   obtenerClientes() {
+    this.cargando = true; // Activar spinner
     this.clienteService.getClientesPerF().subscribe({
       next: (data) => {
         if (data[0] && typeof data[0].personaFisica === 'string') {
@@ -122,13 +126,13 @@ export class ListadoComponent implements OnInit, AfterViewInit {
           this.dataSourceClientes.data = this.clientes;
           this.jsonCompleto = data;
         } else {
-          console.error(
-            'El campo personaFisica no es un string válido o no existe.'
-          );
+          console.error('El campo personaFisica no es un string válido o no existe.');
         }
+        this.cargando = false; // Desactivar spinner
       },
       error: (error) => {
         console.error('Error al obtener clientes:', error);
+        this.cargando = false; // Desactivar spinner en caso de error
       },
     });
   }
@@ -282,4 +286,5 @@ export class ListadoComponent implements OnInit, AfterViewInit {
       }
     });
   }
+
 }
