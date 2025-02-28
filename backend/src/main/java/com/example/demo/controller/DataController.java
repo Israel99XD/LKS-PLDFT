@@ -4,7 +4,11 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import org.springframework.web.client.RestTemplate;
+
+
 import org.springframework.http.HttpHeaders;
+
+
 import org.springframework.http.HttpEntity;
 import org.springframework.http.ResponseEntity;
 
@@ -46,6 +50,18 @@ public class DataController {
          String url = BASE_URL + "/clientes/spsClientesFM/" + codigo + "/" + perfil;
          return fetchExternalData(url, authHeader);
      }
+
+     @GetMapping("/contarClientesFisicos/{codigo}/{perfil}")
+     @PreAuthorize("hasAuthority('ROLE_demo')")
+     public ResponseEntity<String> contarClientesFisicos(
+        @PathVariable String codigo,
+        @PathVariable String perfil,
+        @RequestHeader("Authorization") String authHeader) {
+    
+        String url = BASE_URL + "/clientes/spsClientesFM/" + codigo + "/" + perfil;
+        return fetchExternalData(url, authHeader);
+    
+    }
 
     // Método reutilizable para realizar la petición HTTP externa
     private ResponseEntity<String> fetchExternalData(String url, String authHeader) {
