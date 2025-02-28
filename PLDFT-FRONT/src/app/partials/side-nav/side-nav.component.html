@@ -33,3 +33,22 @@
     </mat-accordion>
   </ul>
 </div>
+<div class="bg-light p-3 d-none d-md-block text-center mb-3">
+  <mat-card class="card-cliente">
+    <mat-card-header>
+      <mat-card-title>Clientes</mat-card-title>
+      <mat-card-subtitle>Conteo de Clientes Físicos</mat-card-subtitle>
+    </mat-card-header>
+    <mat-card-content>
+      <p>
+        Total de clientes: <strong>{{ totalClientesFisicos }}</strong>
+      </p>
+    </mat-card-content>
+    <mat-card-subtitle> Conteo de Clientes Morales </mat-card-subtitle>
+    <mat-card-content>
+      <p>
+        Total de clientes: <strong>{{ totalClientesMorales }}</strong>
+      </p>
+    </mat-card-content>
+  </mat-card>
+</div>
