@@ -140,7 +140,7 @@ export class ToolbarComponent /* implements OnInit */ {
     private oauthService: OAuthService,
     private httpClient: HttpClient,
     private dialog: MatDialog
-  ) {}
+  ) { }
 
   logout() {
     const dialogRef = this.dialog.open(LogoutComponent);
