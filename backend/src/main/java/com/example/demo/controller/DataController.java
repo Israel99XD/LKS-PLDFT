@@ -12,24 +12,51 @@ import org.springframework.http.ResponseEntity;
 @CrossOrigin(origins = "http://localhost:4200", allowedHeaders = "*", methods = { RequestMethod.GET })
 public class DataController {
 
-    @GetMapping("/getClienteData")
-    @PreAuthorize("hasAuthority('ROLE_demo')")
-    public String getClienteData(@RequestHeader("Authorization") String authHeader) {
-        String url = "http://122.8.186.221:7582/clientes/spsClientesFM/TIJ-0000001/268";
+    private final String BASE_URL = "http://122.8.186.221:7582";
 
-        // Obtener el token JWT desde el encabezado Authorization
-        String token = authHeader.replace("Bearer ", "");
+
+    // Obtener movimientos del cliente
+    @GetMapping("/getMovimientos")
+    @PreAuthorize("hasAuthority('ROLE_demo')")
+    public ResponseEntity<String> getMovimientos(@RequestHeader("Authorization") String authHeader) {
+        String url = BASE_URL + "/tesoreria/lista-saldoMovimiento-by-cliente/1/1";
+        return fetchExternalData(url, authHeader);
+    }
+
+    // Obtener datos de un cliente específico
+    @GetMapping("/getClienteData/{codigo}/{perfil}")
+    @PreAuthorize("hasAuthority('ROLE_demo')")
+    public ResponseEntity<String> getClienteData(
+        @PathVariable String codigo, 
+        @PathVariable String perfil,
+        @RequestHeader("Authorization") String authHeader) {
         
-        // Realizar una solicitud HTTP al endpoint externo
+        String url = BASE_URL + "/clientes/spsClientesFM/" + codigo + "/" + perfil;
+        return fetchExternalData(url, authHeader);
+    }
+
+     // Obtener datos de un cliente específico
+     @GetMapping("/getClientesM/{codigo}/{perfil}")
+     @PreAuthorize("hasAuthority('ROLE_demo')")
+     public ResponseEntity<String> getClientesM(
+         @PathVariable String codigo, 
+         @PathVariable String perfil,
+         @RequestHeader("Authorization") String authHeader) {
+         
+         String url = BASE_URL + "/clientes/spsClientesFM/" + codigo + "/" + perfil;
+         return fetchExternalData(url, authHeader);
+     }
+
+    // Método reutilizable para realizar la petición HTTP externa
+    private ResponseEntity<String> fetchExternalData(String url, String authHeader) {
+        String token = authHeader.replace("Bearer ", "");
+
         RestTemplate restTemplate = new RestTemplate();
         HttpHeaders headers = new HttpHeaders();
         headers.set("Authorization", "Bearer " + token);
         HttpEntity<String> entity = new HttpEntity<>(headers);
 
-        // Hacer la solicitud GET
         ResponseEntity<String> response = restTemplate.exchange(url, org.springframework.http.HttpMethod.GET, entity, String.class);
-
-        // Devolver la respuesta externa
-        return response.getBody();
+        return ResponseEntity.ok(response.getBody());
     }
 }

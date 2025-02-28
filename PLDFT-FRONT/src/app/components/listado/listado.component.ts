@@ -12,7 +12,7 @@ import { MatTableDataSource, MatTableModule } from '@angular/material/table'; //
 import { OAuthService } from 'angular-oauth2-oidc'; // Servicio de autenticación OAuth
 import { ParseJsonPipe } from '../../parse-json.pipe'; // Pipe personalizado para parsear JSON
 import { SideNavComponent } from '../../partials/side-nav/side-nav.component'; // Componente de barra lateral
-import { ClienteService } from '../../services/api.service'; // Servicio para obtener datos de clientes
+import { ApiService } from '../../services/api.service'; // Servicio para obtener datos de clientes
 import { InfoClienteComponent } from '../modales/info-cliente/info-cliente.component'; // Modal para mostrar información del cliente
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 
@@ -95,7 +95,7 @@ export class ListadoComponent implements OnInit, AfterViewInit {
 
   // Inyección de dependencias en el constructor
   constructor(
-    private clienteService: ClienteService,
+    private clienteService: ApiService,
     private dialog: MatDialog,
     private oauthService: OAuthService,
     private httpClient: HttpClient
@@ -115,9 +115,16 @@ export class ListadoComponent implements OnInit, AfterViewInit {
   }
 
   // Obtiene la lista de clientes Persona Física desde el servicio
+  // Obtiene la lista de clientes Persona Física desde el servicio
   obtenerClientes() {
     this.cargando = true; // Activar spinner
-    this.clienteService.getClientesPerF().subscribe({
+
+    // Ejemplo: Obtener codigo y perfil con espacio incluido
+    const codigo = '0';
+    const perfil = '268';
+
+    // Llamada a la API pasando los parámetros
+    this.clienteService.getClienteData(codigo, perfil).subscribe({
       next: (data) => {
         if (data[0] && typeof data[0].personaFisica === 'string') {
           const personaFisicaArray = JSON.parse(data[0].personaFisica);
@@ -137,9 +144,16 @@ export class ListadoComponent implements OnInit, AfterViewInit {
     });
   }
 
+
   // Obtiene la lista de clientes Persona Moral desde el servicio
   getClientesPerM() {
-    this.clienteService.getClientesPerM().subscribe({
+
+    this.cargando = true; // Activar spinner
+    // Ejemplo: Obtener codigo y perfil con espacio incluido
+    const codigo = '0';
+    const perfil = '269';
+
+    this.clienteService.getClientesM(codigo, perfil).subscribe({
       next: (data) => {
         if (data[0] && typeof data[0].personaMoral === 'string') {
           const personaMoralArray = JSON.parse(data[0].personaMoral);
@@ -149,17 +163,19 @@ export class ListadoComponent implements OnInit, AfterViewInit {
           this.jsonCompleto = data;
         } else {
           console.error(
-            'El campo personaMoral no es un string válido o no existe.'
-          );
+            'El campo personaMoral no es un string válido o no existe.');
         }
+        this.cargando = false; // Desactivar spinner
       },
       error: (error) => {
         console.error('Error al obtener clientes:', error);
+        this.cargando = false; // Desactivar spinner en caso de error
       },
     });
   }
 
   getMovimientos() {
+    this.cargando = true; // Activar spinner
     this.clienteService.getMovimientos().subscribe({
       next: (data) => {
         if (Array.isArray(data)) {
@@ -170,9 +186,11 @@ export class ListadoComponent implements OnInit, AfterViewInit {
         } else {
           console.error('La respuesta de la API no es un array válido:', data);
         }
+        this.cargando = false; // Desactivar spinner
       },
       error: (error) => {
         console.error('Error al obtener movimientos:', error);
+        this.cargando = false; // Desactivar spinner
       },
     });
   }
@@ -205,10 +223,12 @@ export class ListadoComponent implements OnInit, AfterViewInit {
       this.obtenerClientes();
       this.dataSourceClientesM = new MatTableDataSource<any>();
     }
+
     if (tipoCliente === '2') {
       this.getClientesPerM();
       this.dataSourceClientes = new MatTableDataSource<any>();
     }
+
     if (tipoCliente === '3') {
       this.getMovimientos();
       this.dataSourceMovimientos = new MatTableDataSource<any>();
