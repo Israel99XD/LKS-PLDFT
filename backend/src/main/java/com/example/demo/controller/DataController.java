@@ -11,6 +11,8 @@ import org.springframework.http.HttpHeaders;
 
 import org.springframework.http.HttpEntity;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.GetMapping;
+
 
 @RestController
 @CrossOrigin(origins = "http://localhost:4200", allowedHeaders = "*", methods = { RequestMethod.GET })
@@ -24,6 +26,14 @@ public class DataController {
     @PreAuthorize("hasAuthority('ROLE_demo')")
     public ResponseEntity<String> getMovimientos(@RequestHeader("Authorization") String authHeader) {
         String url = BASE_URL + "/tesoreria/lista-saldoMovimiento-by-cliente/1/1";
+        return fetchExternalData(url, authHeader);
+    }
+
+    // Obtener las transacciones realizadas
+    @GetMapping("/getTransacciones")
+    @PreAuthorize("hasAuthority('ROLE_demo')")
+    public ResponseEntity<String> getTransacciones(@RequestHeader("Authorization") String authHeader) {
+        String url = BASE_URL + "/tesoreria/spsHistorialMovCli/35/0002/1";
         return fetchExternalData(url, authHeader);
     }
 
@@ -51,9 +61,10 @@ public class DataController {
          return fetchExternalData(url, authHeader);
      }
 
-     @GetMapping("/contarClientesFisicos/{codigo}/{perfil}")
+     // Obtener los clientes físicos y Morales
+     @GetMapping("/contarClientes/{codigo}/{perfil}")
      @PreAuthorize("hasAuthority('ROLE_demo')")
-     public ResponseEntity<String> contarClientesFisicos(
+     public ResponseEntity<String> contarClientes(
         @PathVariable String codigo,
         @PathVariable String perfil,
         @RequestHeader("Authorization") String authHeader) {
@@ -62,6 +73,7 @@ public class DataController {
         return fetchExternalData(url, authHeader);
     
     }
+    
 
     // Método reutilizable para realizar la petición HTTP externa
     private ResponseEntity<String> fetchExternalData(String url, String authHeader) {
