@@ -39,7 +39,7 @@ export class SideNavComponent {
   totalClientesFisicos: number = 0;
   totalClientesMorales: number = 0;
 
-  constructor(private apiService: ApiService) {}
+  constructor(private apiService: ApiService) { }
 
   ngOnInit(): void {
     this.contarClientesFisicos();
