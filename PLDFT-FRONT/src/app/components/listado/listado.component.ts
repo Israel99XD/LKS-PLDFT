@@ -115,7 +115,6 @@ export class ListadoComponent implements OnInit, AfterViewInit {
   }
 
   // Obtiene la lista de clientes Persona Física desde el servicio
-  // Obtiene la lista de clientes Persona Física desde el servicio
   obtenerClientes() {
     this.cargando = true; // Activar spinner
 

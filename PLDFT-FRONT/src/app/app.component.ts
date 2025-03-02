@@ -5,7 +5,9 @@ import { OAuthService } from 'angular-oauth2-oidc';  // Servicio para manejar la
 import { CommonModule } from '@angular/common';  // Módulo común de Angular
 import { HttpClient } from '@angular/common/http';  // Cliente HTTP para hacer solicitudes
 import { ToolbarComponent } from './partials/toolbar/toolbar.component';  // Componente de la barra de herramientas
-import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';  // Módulo para el spinner de progreso de Material
+import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
+import { SideNavComponent } from "./partials/side-nav/side-nav.component";  // Módulo para el spinner de progreso de Material
+import { FooterComponent } from './partials/footer/footer.component';
 
 // Se definen los módulos de Material que se usarán en el componente
 const MATERIAL_MODULES = [
@@ -17,11 +19,14 @@ const MATERIAL_MODULES = [
   selector: 'app-root',  // Nombre del selector para el componente
   standalone: true,  // Define que el componente es independiente, sin necesidad de importar módulos adicionales
   imports: [
-    RouterOutlet,  // Permite utilizar el enrutamiento en el componente
-    CommonModule,  // Importa el módulo común de Angular
-    ToolbarComponent,  // Importa el componente de la barra de herramientas
-    MATERIAL_MODULES  // Importa los módulos de Material definidos anteriormente
-  ],
+    RouterOutlet, // Permite utilizar el enrutamiento en el componente
+    CommonModule, // Importa el módulo común de Angular
+    ToolbarComponent, // Importa el componente de la barra de herramientas
+    FooterComponent,
+    MATERIAL_MODULES // Importa los módulos de Material definidos anteriormente
+    ,
+    SideNavComponent
+],
   templateUrl: './app.component.html',  // URL de la plantilla HTML
   styleUrl: './app.component.scss'  // URL del archivo de estilo SCSS
 })

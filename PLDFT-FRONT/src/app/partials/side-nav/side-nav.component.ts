@@ -26,7 +26,9 @@ export class SideNavComponent {
   readonly panelOpenState = signal(false);
   
   obtenerinfo(tipo: string) {
-    this.infoSeleccionada.emit(tipo); // Emite el valor al padre
+    this.infoSeleccionada.emit(tipo);
   }
+
+  
 
 }

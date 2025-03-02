@@ -22,6 +22,7 @@
     "@angular/router": "^18.2.0",
     "angular-oauth2-oidc": "^18.0.0",
     "bootstrap": "^5.3.3",
+    "jquery": "^3.7.1",
     "pldft-front": "file:",
     "rxjs": "~7.8.0",
     "tslib": "^2.3.0",

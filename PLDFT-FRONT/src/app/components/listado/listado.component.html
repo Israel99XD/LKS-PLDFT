@@ -14,7 +14,6 @@
           <input matInput (keyup)="applyFilter($event, 'clientes')" placeholder="BUSCAR POR NOMBRE, ID, RFC"
             #inputUser />
         </mat-form-field>
-
         <div class="mat-elevation-z8 table-responsive">
           <div class="table-container">
             <div *ngIf="!cargando">

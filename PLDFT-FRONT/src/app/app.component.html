@@ -1,5 +1,16 @@
-<app-toolbar />
+<app-toolbar></app-toolbar>
 
-<router-outlet />
+<div class="container-fluid d-flex flex-column">
+  <div class="row flex-grow-1">
+    <!-- Sidebar - Columna izquierda -->
+   <app-side-nav class="col-12 col-md-2 bg-light"></app-side-nav>
 
+    <!-- Contenido principal - Columna derecha -->
+    <div class="col-12 col-md-9 mtb-5">
 
+      <router-outlet></router-outlet>
+    </div>
+  </div>
+  <!-- Footer -->
+  <app-footer></app-footer>
+</div>
