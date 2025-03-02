@@ -8,7 +8,7 @@ import { Observable } from 'rxjs';
 export class ApiService {
   private baseUrl = 'http://localhost:8080'; // URL del backend
 
-  constructor(private http: HttpClient) { }
+  constructor(private http: HttpClient) {}
 
   // Método para obtener los movimientos de clientes
   getMovimientos(): Observable<any> {
@@ -27,7 +27,9 @@ export class ApiService {
       Authorization: `Bearer ${token}`,
     });
 
-    return this.http.get(`${this.baseUrl}/getClienteData/${codigo}/${perfil}`, { headers });
+    return this.http.get(`${this.baseUrl}/getClienteData/${codigo}/${perfil}`, {
+      headers,
+    });
   }
 
   // Método para obtener los clientes del perfil M
@@ -37,6 +39,23 @@ export class ApiService {
       Authorization: `Bearer ${token}`,
     });
 
-    return this.http.get(`${this.baseUrl}/getClientesM/${codigo}/${perfil}`, { headers });
+    return this.http.get(`${this.baseUrl}/getClientesM/${codigo}/${perfil}`, {
+      headers,
+    });
+  }
+
+  // **Nuevo método para contar clientes por perfil**
+  contarClientesFisicos(codigo: string, perfil: string): Observable<any> {
+    const token = localStorage.getItem('token');
+    const headers = new HttpHeaders({
+      Authorization: `Bearer ${token}`,
+    });
+
+    return this.http.get(
+      `${this.baseUrl}/contarClientesFisicos/${codigo}/${perfil}`,
+      {
+        headers,
+      }
+    );
   }
 }
