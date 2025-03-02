@@ -7,6 +7,7 @@ import { MatDialog, MatDialogModule } from '@angular/material/dialog'; // Servic
 import { MatFormFieldModule } from '@angular/material/form-field'; // Módulo de formulario de Material
 import { MatInputModule } from '@angular/material/input';
 import { MatPaginator, MatPaginatorModule } from '@angular/material/paginator'; // Componente para paginación de Material
+import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatSort, MatSortModule } from '@angular/material/sort'; // Componente para ordenar tablas de Material
 import { MatTableDataSource, MatTableModule } from '@angular/material/table'; // Fuente de datos para las tablas de Material
 import { OAuthService } from 'angular-oauth2-oidc'; // Servicio de autenticación OAuth
@@ -14,8 +15,6 @@ import { ParseJsonPipe } from '../../parse-json.pipe'; // Pipe personalizado par
 import { SideNavComponent } from '../../partials/side-nav/side-nav.component'; // Componente de barra lateral
 import { ApiService } from '../../services/api.service'; // Servicio para obtener datos de clientes
 import { InfoClienteComponent } from '../modales/info-cliente/info-cliente.component'; // Modal para mostrar información del cliente
-import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
-
 
 // Agrupación de módulos de Material para facilitar la importación
 const MATERIAL_MODULES = [
@@ -26,8 +25,16 @@ const MATERIAL_MODULES = [
   MatFormFieldModule,
   MatDialogModule,
   MatButtonModule,
-  MatProgressSpinnerModule
+  MatProgressSpinnerModule,
 ];
+
+interface Transaccion {
+  cveMovimiento: string;
+  monto: number;
+  descTipoMov: string;
+  fecha: string;
+  esAnomalo?: boolean; // Propiedad para detectar anomalías
+}
 
 // Decorador del componente
 @Component({
@@ -41,7 +48,9 @@ export class ListadoComponent implements OnInit, AfterViewInit {
   mostrarTabla: string | null = null; // Variable para determinar qué tabla mostrar
   clientes: any[] = []; // Almacena clientes de tipo Persona Física
   otrosDatos: any[] = []; // Almacena clientes de tipo Persona Moral
-  movimientos: any[] = [];
+  movimientos: any[] = []; // Almacena los movimientos realizados
+  transacciones: any[] = []; // Almacena las transacciones
+  montosAnomalos: number[] = []; // Array para almacenar montos anómalos
   jsonCompleto: any; // Guarda el JSON completo recibido
   cargando: boolean = false;
 
@@ -81,13 +90,21 @@ export class ListadoComponent implements OnInit, AfterViewInit {
     'movimientoID',
     'cveMovimiento',
     'descMovimiento',
-    'saldo'
+    'saldo',
+  ];
+
+  displayedColumnsTransacciones: string[] = [
+    'cveMovimiento',
+    'monto',
+    'descTipoMov',
+    'fecha',
   ];
 
   // Fuente de datos para las tablas de Persona Física y Persona Moral
   dataSourceClientes = new MatTableDataSource<any>();
   dataSourceClientesM = new MatTableDataSource<any>();
   dataSourceMovimientos = new MatTableDataSource<any>();
+  dataSourceTransacciones = new MatTableDataSource<Transaccion>([]);
 
   // Referencias a los componentes de paginación y ordenación
   @ViewChild(MatPaginator) paginator!: MatPaginator;
@@ -99,10 +116,10 @@ export class ListadoComponent implements OnInit, AfterViewInit {
     private dialog: MatDialog,
     private oauthService: OAuthService,
     private httpClient: HttpClient
-  ) { }
+  ) {}
 
   // Método del ciclo de vida de Angular, se ejecuta al iniciar el componente
-  ngOnInit() { }
+  ngOnInit() {}
 
   // Método que se ejecuta después de que la vista se ha inicializado
   ngAfterViewInit() {
@@ -112,6 +129,8 @@ export class ListadoComponent implements OnInit, AfterViewInit {
     this.dataSourceClientesM.sort = this.sort;
     this.dataSourceMovimientos.paginator = this.paginator;
     this.dataSourceMovimientos.sort = this.sort;
+    this.dataSourceTransacciones.paginator = this.paginator;
+    this.dataSourceTransacciones.sort = this.sort;
   }
 
   // Obtiene la lista de clientes Persona Física desde el servicio
@@ -133,7 +152,9 @@ export class ListadoComponent implements OnInit, AfterViewInit {
           this.dataSourceClientes.data = this.clientes;
           this.jsonCompleto = data;
         } else {
-          console.error('El campo personaFisica no es un string válido o no existe.');
+          console.error(
+            'El campo personaFisica no es un string válido o no existe.'
+          );
         }
         this.cargando = false; // Desactivar spinner
       },
@@ -144,10 +165,8 @@ export class ListadoComponent implements OnInit, AfterViewInit {
     });
   }
 
-
   // Obtiene la lista de clientes Persona Moral desde el servicio
   getClientesPerM() {
-
     this.cargando = true; // Activar spinner
     // Ejemplo: Obtener codigo y perfil con espacio incluido
     const codigo = '0';
@@ -163,7 +182,8 @@ export class ListadoComponent implements OnInit, AfterViewInit {
           this.jsonCompleto = data;
         } else {
           console.error(
-            'El campo personaMoral no es un string válido o no existe.');
+            'El campo personaMoral no es un string válido o no existe.'
+          );
         }
         this.cargando = false; // Desactivar spinner
       },
@@ -195,6 +215,28 @@ export class ListadoComponent implements OnInit, AfterViewInit {
     });
   }
 
+  // Método para obtener las transacciones
+  getTransacciones() {
+    this.cargando = true; // Activar spinner
+    this.clienteService.getTransacciones().subscribe({
+      next: (data) => {
+        if (Array.isArray(data)) {
+          // Verifica si data es un array
+          this.transacciones = data; // Asigna directamente los movimientos
+          console.log('Transacciones obtenidos:', this.transacciones);
+          this.dataSourceTransacciones.data = this.transacciones; // Actualiza la tabla
+        } else {
+          console.error('La respuesta de la API no es un array válido:', data);
+        }
+        this.cargando = false; // Desactivar spinner
+      },
+      error: (error) => {
+        console.error('Error al obtener transacciones:', error);
+        this.cargando = false; // Desactivar spinner
+      },
+    });
+  }
+
   // Filtra los resultados en la tabla según el tipo de cliente
   applyFilter(event: Event, tipo: string) {
     const filterValue = (event.target as HTMLInputElement).value;
@@ -212,6 +254,11 @@ export class ListadoComponent implements OnInit, AfterViewInit {
       this.dataSourceMovimientos.filter = filterValue.trim().toLowerCase();
       if (this.dataSourceMovimientos.paginator) {
         this.dataSourceMovimientos.paginator.firstPage();
+      }
+    } else if (tipo === 'transacciones') {
+      this.dataSourceTransacciones.filter = filterValue.trim().toLowerCase();
+      if (this.dataSourceTransacciones.paginator) {
+        this.dataSourceTransacciones.paginator.firstPage();
       }
     }
   }
@@ -232,6 +279,11 @@ export class ListadoComponent implements OnInit, AfterViewInit {
     if (tipoCliente === '3') {
       this.getMovimientos();
       this.dataSourceMovimientos = new MatTableDataSource<any>();
+    }
+
+    if (tipoCliente === '4') {
+      this.getTransacciones();
+      this.dataSourceTransacciones = new MatTableDataSource<any>();
     }
   }
 
@@ -306,5 +358,4 @@ export class ListadoComponent implements OnInit, AfterViewInit {
       }
     });
   }
-
 }

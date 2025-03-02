@@ -20,6 +20,16 @@ export class ApiService {
     return this.http.get(`${this.baseUrl}/getMovimientos`, { headers });
   }
 
+  // Método para obtener las transacciones
+  getTransacciones(): Observable<any> {
+    const token = localStorage.getItem('token');
+    const headers = new HttpHeaders({
+      Authorization: `Bearer ${token}`,
+    });
+
+    return this.http.get(`${this.baseUrl}/getTransacciones`, { headers });
+  }
+
   // Método para obtener los datos de un cliente específico
   getClienteData(codigo: string, perfil: string): Observable<any> {
     const token = localStorage.getItem('token');
@@ -45,17 +55,14 @@ export class ApiService {
   }
 
   // **Nuevo método para contar clientes por perfil**
-  contarClientesFisicos(codigo: string, perfil: string): Observable<any> {
+  contarClientes(codigo: string, perfil: string): Observable<any> {
     const token = localStorage.getItem('token');
     const headers = new HttpHeaders({
       Authorization: `Bearer ${token}`,
     });
 
-    return this.http.get(
-      `${this.baseUrl}/contarClientesFisicos/${codigo}/${perfil}`,
-      {
-        headers,
-      }
-    );
+    return this.http.get(`${this.baseUrl}/contarClientes/${codigo}/${perfil}`, {
+      headers,
+    });
   }
 }
